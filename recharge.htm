@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>تعيين الرصيد</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCJ83B2SofU5cBoeRN3XE215n2-Z8_HJl4",
+      authDomain: "autolease-hub.firebaseapp.com",
+      projectId: "autolease-hub",
+      storageBucket: "autolease-hub.appspot.com",
+      messagingSenderId: "142933547240",
+      appId: "1:142933547240:web:fd123d30723c69c799915d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentDocRef;
+
+    // عندما يقوم المستخدم بتسجيل الدخول
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const uid = user.uid;
+        currentDocRef = doc(db, "captains", uid);
+        const docSnap = await getDoc(currentDocRef);
+        if (docSnap.exists()) {
+          document.getElementById("balance").textContent = docSnap.data().balance + " ج.س";
+        }
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+
+    // دالة لتحديث الرصيد بعد إدخال الكود
+    window.rechargeBalance = async () => {
+      const code = document.getElementById("rechargeCode").value;
+      const rechargeRef = doc(db, "recharge_codes", code);
+
+      const codeSnap = await getDoc(rechargeRef);
+
+      if (!codeSnap.exists()) {
+        alert("الكود غير موجود.");
+        return;
+      }
+
+      if (codeSnap.data().used) {
+        alert("تم استخدام هذا الكود بالفعل.");
+        return;
+      }
+
+      const amount = codeSnap.data().amount;
+
+      // تحديث رصيد الكابتن
+      const captainSnap = await getDoc(currentDocRef);
+      const currentBalance = captainSnap.data().balance;
+      const newBalance = currentBalance + amount;
+
+      // تحديث رصيد الكابتن في Firestore
+      await updateDoc(currentDocRef, { balance: newBalance });
+
+      // تحديث الكود ليصبح "مستخدم"
+      await updateDoc(rechargeRef, { used: true });
+
+      alert("تم شحن رصيدك بمبلغ " + amount + " ج.س. رصيدك الجديد هو " + newBalance + " ج.س.");
+    };
+  </script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col font-sans">
+
+  <header class="bg-yellow-500 text-white py-4 shadow-md">
+    <h1 class="text-center text-xl font-bold">تعيين الرصيد</h1>
+  </header>
+
+  <main class="flex-1 px-4 py-6 max-w-md mx-auto">
+    <div class="bg-white p-6 rounded-xl shadow text-center">
+      <p class="text-gray-700 font-semibold mb-2">رصيدك الحالي:</p>
+      <p class="text-green-600 text-xl font-bold mb-4" id="balance">0 ج.س</p>
+
+      <!-- إدخال الكود -->
+      <input type="text" id="rechargeCode" placeholder="أدخل كود الشحن" class="w-full p-2 border rounded mb-4 text-center">
+
+      <!-- زر الشحن -->
+      <button onclick="rechargeBalance()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 rounded transition">
+        شحن الرصيد
+      </button>
+    </div>
+  </main>
+
+  <footer class="text-center py-4">
+    <a href="adham.htm" class="text-blue-600 hover:underline font-semibold">العودة إلى الملف الشخصي</a>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>لوحة تحكم الأدمن</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCJ83B2SofU5cBoeRN3XE215n2-Z8_HJl4",
+      authDomain: "autolease-hub.firebaseapp.com",
+      projectId: "autolease-hub",
+      storageBucket: "autolease-hub.appspot.com",
+      messagingSenderId: "142933547240",
+      appId: "1:142933547240:web:fd123d30723c69c799915d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const adminUID = "admin";
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user || user.uid !== adminUID) {
+        alert("ليس لديك صلاحية.");
+        window.location.href = "readmin.html";
+        return;
+      }
+
+      const container = document.getElementById("requests");
+      const snapshot = await getDocs(collection(db, "admin_requests"));
+
+      if (snapshot.empty) {
+        container.innerHTML = "<p class='text-gray-500'>لا توجد طلبات حالياً.</p>";
+        return;
+      }
+
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const div = document.createElement("div");
+        div.className = "bg-white shadow p-4 rounded-lg mb-3";
+
+        div.innerHTML = `
+          <p><strong>UID:</strong> ${data.targetUid}</p>
+          <p class="text-sm text-gray-500">طلب بواسطة: ${data.requestedBy}</p>
+          <button class="mt-2 bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600">تعيين كـ Admin</button>
+        `;
+
+        const button = div.querySelector("button");
+        button.addEventListener("click", async () => {
+          try {
+            await setDoc(doc(db, "admins", data.targetUid), {
+              role: "admin",
+              grantedBy: user.uid,
+              timestamp: new Date()
+            });
+
+            await deleteDoc(doc(db, "admin_requests", docSnap.id));
+            alert("تم تعيين المستخدم كـ Admin");
+            div.remove();
+          } catch (err) {
+            console.error(err);
+            alert("حدث خطأ أثناء التعيين.");
+          }
+        });
+
+        container.appendChild(div);
+      });
+    });
+  </script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+  <h1 class="text-2xl font-bold mb-4 text-center text-gray-800">طلبات تعيين Admin</h1>
+  <div id="requests" class="max-w-xl mx-auto"></div>
+</body>
+</html>

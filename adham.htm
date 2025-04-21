@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ملفي الشخصي</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+ <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCJ83B2SofU5cBoeRN3XE215n2-Z8_HJl4",
+    authDomain: "autolease-hub.firebaseapp.com",
+    projectId: "autolease-hub",
+    storageBucket: "autolease-hub.firebasestorage.app",
+    messagingSenderId: "142933547240",
+    appId: "1:142933547240:web:fd123d30723c69c799915d"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // عندما يتم تسجيل الدخول
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      const uid = user.uid;
+      const userRef = doc(db, "captains", uid); // تأكد أن بيانات الكباتن مخزنة هنا
+      const userSnap = await getDoc(userRef);
+
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        document.getElementById("captainName").textContent = data.name || "كابتن";
+        document.getElementById("balance").textContent = data.balance + " ج.س";
+        document.getElementById("location").textContent = data.city + "، " + data.country;
+      } else {
+        alert("لا توجد بيانات لهذا المستخدم.");
+      }
+    } else {
+      window.location.href = "login.html"; // إعادة التوجيه إذا لم يتم تسجيل الدخول
+    }
+  });
+</script> 
+  
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col font-sans">
+
+  <!-- رأس الصفحة -->
+  <header class="bg-yellow-500 text-white py-4 shadow-md">
+    <h1 class="text-center text-xl font-bold">الملف الشخصي</h1>
+  </header>
+
+  <!-- محتوى الصفحة -->
+  <main class="flex-1 flex items-center justify-center px-4 py-6">
+    <div class="bg-white rounded-2xl shadow-lg w-full max-w-md p-6 text-center">
+
+      <!-- صورة المستخدم -->
+      <div class="mb-4">
+        <img src="https://www.svgrepo.com/show/382106/account-avatar-profile-user-11.svg" alt="avatar"
+             class="w-24 h-24 mx-auto rounded-full border-4 border-yellow-300 shadow-md">
+      </div>
+
+      <!-- الاسم والرصيد -->
+      <h2 class="text-xl font-bold text-gray-800 mb-1" id="captainName">اسم الكابتن</h2>
+      <p class="text-green-600 text-lg font-semibold" id="balance">10,290 ج.س</p>
+      <p class="text-gray-500 text-sm mt-1" id="location">بورتسودان، السودان</p>
+
+      <!-- أزرار العمليات -->
+      <div class="grid grid-cols-2 gap-3 mt-6">
+        <button class="bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg transition">الحسابات</button>
+        <button class="bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition">طلباتي</button>
+        <button class="bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-lg transition">تعيين الرصيد</button>
+        <button class="bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg transition">حذف حسابي</button>
+        <button class="col-span-2 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-lg transition">تعديل ملفي</button>
+      </div>
+
+      <!-- زر تسجيل الخروج -->
+      <button class="mt-6 w-full bg-blue-700 hover:bg-blue-800 text-white py-3 rounded-xl text-base font-semibold transition">تسجيل خروج</button>
+    </div>
+  </main>
+
+  <!-- شريط التنقل السفلي -->
+  <nav class="bg-white border-t shadow-inner py-2">
+    <div class="flex justify-around text-sm text-gray-600">
+      <button class="flex flex-col items-center text-blue-600 font-bold">
+        <span>طلبات الآن</span>
+      </button>
+      <button class="flex flex-col items-center">
+        <span>الطلبات السابقة</span>
+      </button>
+      <button class="flex flex-col items-center">
+        <span>الملف الشخصي</span>
+      </button>
+    </div>
+  </nav>
+
+</body>
+</html>

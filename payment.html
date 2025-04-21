@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>الدفع - تأكيد الطلب</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      direction: rtl;
+      background: linear-gradient(to right, #e0ecf8, #fefefe);
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .form-group i {
+      position: absolute;
+      top: 12px;
+      left: 15px;
+      color: #007BFF;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 12px 40px 12px 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    label {
+      margin-bottom: 5px;
+      display: block;
+      font-weight: bold;
+      color: #555;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      color: #999;
+      font-size: 14px;
+    }
+    .file-upload {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  border: 2px dashed #3498db;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+  background-color: #f8f9fa;
+}
+
+.upload-label:hover {
+  background-color: #e9f5ff;
+  border-color: #2980b9;
+}
+
+.upload-label i {
+  font-size: 50px;
+  color: #3498db;
+  margin-bottom: 15px;
+}
+
+.file-info {
+  margin-top: 10px;
+  color: #666;
+  font-size: 14px;
+}
+
+.preview-container {
+  margin-top: 20px;
+  max-width: 300px;
+  display: none;
+}
+
+.preview-container img {
+  max-width: 100%;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+  </style>
+ 
+ <!-- Firebase Core -->
+
+</head>
+
+  
+<body>
+
+ <body>
+  <div class="container">
+    <h2><i class="fas fa-credit-card"></i> تأكيد الدفع</h2>
+    
+    <form action="thankyou.html" method="POST">
+      <!-- معلومات العميل -->
+      <div class="form-group">
+        <label for="fullname"><i class="fas fa-user"></i> الاسم الكامل</label>
+        <input type="text" id="fullname" name="fullname" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="phone"><i class="fas fa-phone"></i> رقم الهاتف</label>
+        <input type="tel" id="phone" name="phone" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="address"><i class="fas fa-map-marker-alt"></i> العنوان</label>
+        <textarea id="address" name="address" rows="3" required></textarea>
+      </div>
+      
+      <!-- طريقة الدفع -->
+      <div class="form-group">
+        <label for="paymentMethod"><i class="fas fa-money-bill-wave"></i> طريقة الدفع</label>
+        <select id="paymentMethod" name="payment_method" required>
+          <option value="">-- اختر طريقة الدفع --</option>
+          <option value="cash">كاش عند الاستلام</option>
+          <option value="bank">تحويل بنكي</option>
+          <option value="mobile">تحويل عبر تطبيق البنك</option>
+        </select>
+      </div>
+      
+      <!-- رفع صورة الإشعار -->
+      <div class="file-upload">
+        <label for="paymentLogo" class="upload-label">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <span>صورة إشعار الدفع</span>
+        </label>
+        <input type="file" id="paymentLogo" accept="image/*" style="display: none;">
+        <div class="file-info" id="fileInfo">لم يتم اختيار ملف</div>
+        <div class="preview-container" id="imagePreview"></div>
+      </div>
+      
+      <!-- زر التأكيد -->
+      <button type="submit" id="confirmButton">
+        <i class="fas fa-check-circle"></i> تأكيد الطلب
+      </button>
+    </form>
+  </div>
+  
+  <footer>
+    &copy; 2025 جميع الحقوق محفوظة - موقع بيع وإيجار السيارات
+  </footer>
+  // تأكد من أن هذه المكتبات مضمنة في صفحتك
+ <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+ <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // تهيئة Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyCg-t0sXRLEZfZe5R9Paip5A715_5dlvR0",
+        authDomain: "local-market-7f56c.firebaseapp.com",
+        projectId: "local-market-7f56c",
+        storageBucket: "local-market-7f56c.appspot.com",
+        messagingSenderId: "178795459798",
+        appId: "1:178795459798:web:2252889ab3b5cdfd168577"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const storage = firebase.storage();
+    const database = firebase.database();
+
+    // العناصر الرئيسية
+    const confirmBtn = document.getElementById("confirmButton");
+    const paymentMethod = document.getElementById("paymentMethod");
+    const paymentLogo = document.getElementById("paymentLogo");
+    
+    confirmBtn.addEventListener("click", async function() {
+        const name = document.getElementById("fullname").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const address = document.getElementById("address").value.trim();
+        const method = paymentMethod.value;
+        
+        // التحقق من البيانات المطلوبة
+        if (!name || !phone || !address || !method) {
+            Swal.fire('خطأ', 'الرجاء تعبئة جميع الحقول المطلوبة', 'warning');
+            return;
+        }
+        
+        // إذا كان الدفع نقداً
+        if (method === "cash") {
+            await Swal.fire({
+                icon: 'success',
+                title: 'شكراً لتعاملك معنا',
+                text: 'سنقوم بالتواصل معك لتأكيد الطلب',
+                confirmButtonText: 'تم'
+            });
+            
+            // حفظ البيانات بدون صورة
+            savePaymentData(name, phone, address, method, null);
+            return;
+        }
+        
+        // إذا كانت طريقة دفع أخرى وتتطلب صورة
+        if (!paymentLogo.files[0]) {
+            Swal.fire('خطأ', 'الرجاء رفع صورة إثبات الدفع', 'warning');
+            return;
+        }
+        
+        // رفع الصورة ثم حفظ البيانات
+        const file = paymentLogo.files[0];
+        const storageRef = storage.ref('payment-proofs/' + Date.now() + '_' + file.name);
+        
+        try {
+            const snapshot = await storageRef.put(file);
+            const downloadURL = await snapshot.ref.getDownloadURL();
+            await savePaymentData(name, phone, address, method, downloadURL);
+            Swal.fire('نجاح', 'تم تأكيد الطلب بنجاح', 'success');
+        } catch (error) {
+            Swal.fire('خطأ', 'حدث خطأ أثناء رفع الملف: ' + error.message, 'error');
+        }
+    });
+    
+    // دالة لحفظ البيانات في Firebase
+    async function savePaymentData(name, phone, address, method, imageUrl) {
+        const paymentData = {
+            name: name,
+            phone: phone,
+            address: address,
+            paymentMethod: method,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        };
+        
+        if (imageUrl) {
+            paymentData.paymentProof = imageUrl;
+        }
+        
+        try {
+            await database.ref('payments').push(paymentData);
+        } catch (error) {
+            throw error;
+        }
+    }
+});
+</script>
+</body>
+
+    
+</html>
