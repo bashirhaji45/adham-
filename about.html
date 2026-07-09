@@ -85,43 +85,7 @@
 
   <div class="grid" id="carGrid"></div>
 
-  <script>
-    const cars = [
-      { name: "Pickup Truck", count: "205,258", img: "https://upload.wikimedia.org/wikipedia/commons/7/73/2019_RAM_1500_Big_Horn_Crew_Cab_4x4_in_Flame_Red%2C_front_left.jpg" },
-      { name: "SUV", count: "362,419", img: "https://upload.wikimedia.org/wikipedia/commons/f/f2/2017_Mazda_CX-5_GT_AWD_front_4.2.18.jpg" },
-      { name: "Sedan", count: "212,238", img: "https://upload.wikimedia.org/wikipedia/commons/e/e7/2018_Infiniti_Q50_3.0t_AWD_Sport_front_6.15.18.jpg" },
-      { name: "Wagon", count: "74,146", img: "https://upload.wikimedia.org/wikipedia/commons/3/39/2012_Subaru_Impreza_%28G4%29_2.0i_wagon_%282015-07-14%29_01.jpg" },
-      { name: "Minivan", count: "24,432", img: "https://upload.wikimedia.org/wikipedia/commons/e/e6/2018_Honda_Odyssey_Elite_front_5.20.18.jpg" },
-      { name: "Hatchback", count: "29,440", img: "https://upload.wikimedia.org/wikipedia/commons/3/3e/2016_Ford_Fiesta_Zetec_Turbo_1.0.jpg" },
-      { name: "Coupe", count: "18,310", img: "https://upload.wikimedia.org/wikipedia/commons/f/f0/Audi_TT_Coupe_Genf_2018.jpg" },
-      { name: "Convertible", count: "15,902", img: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Chevrolet_Corvette_C7_Convertible_IMG_0404.jpg" }
-    ];
-
-    const grid = document.getElementById("carGrid");
-    const searchInput = document.getElementById("searchInput");
-
-    function renderCars(filter = "") {
-      grid.innerHTML = "";
-      const filtered = cars.filter(car => car.name.toLowerCase().includes(filter.toLowerCase()));
-      filtered.forEach(car => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <img src="${car.img}" alt="${car.name}">
-          <h3>${car.name}</h3>
-          <p>(${car.count})</p>
-          <button class="order-button">Order</button>
-        `;
-        grid.appendChild(card);
-      });
-    }
-
-    renderCars();
-
-    searchInput.addEventListener("input", () => {
-      renderCars(searchInput.value);
-    };
-  </script>
+  
 
 </body>
 </html>
