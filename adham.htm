@@ -4,45 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ملفي الشخصي</title>
-  <script src="https://cdn.tailwindcss.com"></script>
- <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCJ83B2SofU5cBoeRN3XE215n2-Z8_HJl4",
-    authDomain: "autolease-hub.firebaseapp.com",
-    projectId: "autolease-hub",
-    storageBucket: "autolease-hub.firebasestorage.app",
-    messagingSenderId: "142933547240",
-    appId: "1:142933547240:web:fd123d30723c69c799915d"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  // عندما يتم تسجيل الدخول
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      const uid = user.uid;
-      const userRef = doc(db, "captains", uid); // تأكد أن بيانات الكباتن مخزنة هنا
-      const userSnap = await getDoc(userRef);
-
-      if (userSnap.exists()) {
-        const data = userSnap.data();
-        document.getElementById("captainName").textContent = data.name || "كابتن";
-        document.getElementById("balance").textContent = data.balance + " ج.س";
-        document.getElementById("location").textContent = data.city + "، " + data.country;
-      } else {
-        alert("لا توجد بيانات لهذا المستخدم.");
-      }
-    } else {
-      window.location.href = "login.html"; // إعادة التوجيه إذا لم يتم تسجيل الدخول
-    }
-  });
-</script> 
+ 
   
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col font-sans">
